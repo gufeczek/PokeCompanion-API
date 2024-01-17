@@ -1,6 +1,4 @@
-package com.gufeczek.pokecompanion.controller
-
-import java.util.*
+package com.gufeczek.pokecompanion.controller.dto
 
 data class PokemonDto(
     val id: Int,

@@ -8,16 +8,10 @@ data class CuratedPage<T>(
     val results: List<T>
 )
 
-fun <T> Page<T>.toCuratedPage(): CuratedPage<T> {
-    val nextOffset = if (!this.isLast) {
-        this.pageable.offset + this.size
-    } else {
-        null
-    }
-
+fun <T> Page<T>.toCuratedPage(nextOffset: Int?): CuratedPage<T> {
     return CuratedPage(
         count = this.totalElements,
-        nextOffset = nextOffset,
+        nextOffset = nextOffset?.toLong(),
         results = this.content
     )
 }
