@@ -3,11 +3,11 @@ package com.gufeczek.pokecompanion.service
 import com.gufeczek.pokecompanion.controller.dto.PokemonDto
 import com.gufeczek.pokecompanion.core.CuratedPage
 import com.gufeczek.pokecompanion.core.OffsetPageRequest
-import com.gufeczek.pokecompanion.model.Pokemon
 import com.gufeczek.pokecompanion.core.toCuratedPage
+import com.gufeczek.pokecompanion.model.Type
 import com.gufeczek.pokecompanion.repository.PokemonRepository
+import com.gufeczek.pokecompanion.repository.PokemonTypeRepository
 import org.springframework.core.io.ResourceLoader
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
@@ -15,20 +15,26 @@ import org.springframework.stereotype.Service
 @Service
 class PokemonService(
     private val pokemonRepository: PokemonRepository,
+    private val pokemonTypeRepository: PokemonTypeRepository,
     private val resourceLoader: ResourceLoader
 ) {
-    fun getPokemonPage(substring: String, offset: Int, limit: Int): CuratedPage<PokemonDto> {
+    fun getPokemonPage(query: String, offset: Int, limit: Int): CuratedPage<PokemonDto> {
         val pageable = OffsetPageRequest.of(offset, limit, Sort.unsorted())
-        val page = pokemonRepository.findByNameContaining(substring, pageable)
+        val page = pokemonRepository.findByNameContaining(query, pageable)
 
         val pokemons = page.content.mapNotNull { pokemon ->
             val image = getPokemonImage(pokemonId = pokemon.id)
-            image?.let {
+            val primaryType = getPokemonPrimaryType(pokemon.id)?.name
+
+            if (image != null && primaryType != null) {
                 PokemonDto(
                     id = pokemon.id,
                     name = pokemon.name,
-                    image = it
+                    primaryType = primaryType,
+                    image = image
                 )
+            } else {
+                null
             }
         }
         val nextOffset = page.content.lastOrNull()?.id?.plus(1)
@@ -45,6 +51,10 @@ class PokemonService(
             return resource.inputStream.readAllBytes()
         }
         return null
+    }
+
+    private fun getPokemonPrimaryType(pokemonId: Int): Type? {
+        return pokemonTypeRepository.findPrimaryTypeByPokemonId(pokemonId)
     }
 
 }

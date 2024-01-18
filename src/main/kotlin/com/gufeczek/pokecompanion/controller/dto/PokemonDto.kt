@@ -3,6 +3,7 @@ package com.gufeczek.pokecompanion.controller.dto
 data class PokemonDto(
     val id: Int,
     val name: String,
+    val primaryType: String,
     val image: ByteArray
 ) {
     override fun equals(other: Any?): Boolean {

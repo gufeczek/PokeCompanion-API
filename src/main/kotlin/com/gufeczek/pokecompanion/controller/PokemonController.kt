@@ -13,16 +13,14 @@ class PokemonController(
 ) {
     @GetMapping("/pokemon")
     fun getPokemonPage(
-        @RequestParam(required = false) substring: String?,
+        @RequestParam(required = false) query: String?,
         @RequestParam offset: Int,
         @RequestParam limit: Int,
     ): CuratedPage<PokemonDto> {
         return pokemonService.getPokemonPage(
-            substring = substring ?: "",
+            query = query ?: "",
             offset = offset,
             limit = limit
         )
     }
-
-
 }

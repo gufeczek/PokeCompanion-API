@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.PagingAndSortingRepository
 
 interface PokemonRepository : PagingAndSortingRepository<Pokemon, Int> {
-    fun findByNameContaining(substring: String, pageable: Pageable): Page<Pokemon>
+    fun findByNameContaining(query: String, pageable: Pageable): Page<Pokemon>
 }
