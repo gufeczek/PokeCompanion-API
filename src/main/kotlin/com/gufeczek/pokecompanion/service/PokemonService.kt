@@ -7,6 +7,17 @@ import com.gufeczek.pokecompanion.core.paging.toCuratedPage
 import com.gufeczek.pokecompanion.model.Type
 import com.gufeczek.pokecompanion.repository.PokemonRepository
 import com.gufeczek.pokecompanion.repository.PokemonTypeRepository
+import java.util.concurrent.Executors
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.withContext
 import org.springframework.core.io.ResourceLoader
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Sort
@@ -18,28 +29,30 @@ class PokemonService(
     private val pokemonTypeRepository: PokemonTypeRepository,
     private val resourceLoader: ResourceLoader
 ) {
-    fun getPokemonPage(query: String, offset: Int, limit: Int): CuratedPage<PokemonDto> {
+    suspend fun getPokemonPage(query: String, offset: Int, limit: Int): CuratedPage<PokemonDto> = withContext(Dispatchers.IO) {
         val pageable = OffsetPageRequest.of(offset, limit, Sort.unsorted())
         val page = pokemonRepository.findByNameContaining(query, pageable)
 
-        val pokemons = page.content.mapNotNull { pokemon ->
-            val image = getPokemonImage(pokemonId = pokemon.id)
-            val primaryType = getPokemonPrimaryType(pokemon.id)?.name
+        val pokemons = page.content.map {  pokemon ->
+            async {
+                val image = getPokemonImage(pokemonId = pokemon.id)
+                val primaryType = getPokemonPrimaryType(pokemon.id)?.name
 
-            if (image != null && primaryType != null) {
-                PokemonDto(
-                    id = pokemon.id,
-                    name = pokemon.name,
-                    primaryType = primaryType,
-                    image = image
-                )
-            } else {
-                null
+                if (image != null && primaryType != null) {
+                    PokemonDto(
+                        id = pokemon.id,
+                        name = pokemon.name,
+                        primaryType = primaryType,
+                        image = image
+                    )
+                } else {
+                    null
+                }
             }
-        }
+        }.awaitAll().filterNotNull()
         val nextOffset = page.content.lastOrNull()?.id?.plus(1)
 
-        return PageImpl(pokemons, page.pageable, page.totalElements).toCuratedPage(nextOffset)
+        PageImpl(pokemons, page.pageable, page.totalElements).toCuratedPage(nextOffset)
     }
 
     private fun getPokemonImage(pokemonId: Int): ByteArray? {
@@ -56,5 +69,4 @@ class PokemonService(
     private fun getPokemonPrimaryType(pokemonId: Int): Type? {
         return pokemonTypeRepository.findPrimaryTypeByPokemonId(pokemonId)
     }
-
 }

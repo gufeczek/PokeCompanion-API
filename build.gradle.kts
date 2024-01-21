@@ -26,6 +26,9 @@ dependencies {
 	implementation("com.h2database:h2:2.2.224")
 	implementation("com.google.guava:guava:33.0.0-jre")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.7.3")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.7.3")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

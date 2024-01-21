@@ -12,7 +12,7 @@ class PokemonController(
     private val pokemonService: PokemonService
 ) {
     @GetMapping("/pokemon")
-    fun getPokemonPage(
+    suspend fun getPokemonPage(
         @RequestParam(required = false) query: String?,
         @RequestParam offset: Int,
         @RequestParam limit: Int,
