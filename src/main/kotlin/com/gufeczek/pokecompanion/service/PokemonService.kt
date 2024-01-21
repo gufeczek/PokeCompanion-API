@@ -1,9 +1,9 @@
 package com.gufeczek.pokecompanion.service
 
 import com.gufeczek.pokecompanion.controller.dto.PokemonDto
-import com.gufeczek.pokecompanion.core.CuratedPage
-import com.gufeczek.pokecompanion.core.OffsetPageRequest
-import com.gufeczek.pokecompanion.core.toCuratedPage
+import com.gufeczek.pokecompanion.core.paging.CuratedPage
+import com.gufeczek.pokecompanion.core.paging.OffsetPageRequest
+import com.gufeczek.pokecompanion.core.paging.toCuratedPage
 import com.gufeczek.pokecompanion.model.Type
 import com.gufeczek.pokecompanion.repository.PokemonRepository
 import com.gufeczek.pokecompanion.repository.PokemonTypeRepository

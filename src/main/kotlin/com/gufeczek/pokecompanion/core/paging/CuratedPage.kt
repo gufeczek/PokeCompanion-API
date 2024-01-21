@@ -1,4 +1,4 @@
-package com.gufeczek.pokecompanion.core
+package com.gufeczek.pokecompanion.core.paging
 
 import org.springframework.data.domain.Page
 
